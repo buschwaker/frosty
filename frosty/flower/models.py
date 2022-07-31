@@ -47,10 +47,9 @@ class MyUser(AbstractUser):
         self.save()
 
     def clean(self):
-        """Поднимает ошибку при попытке поменять роль 
-        пользователя на покупателя,
-        который будучи продавцом имеет незакрытые лоты
-        """
+        """Поднимает ошибку при попытке поменять роль пользователя
+        на покупателя, который будучи продавцом имеет незакрытые лоты
+         """
         if self.role == self.customer and self.items.exists():
             raise ValidationError(
                 'У пользователя, которому вы хотите'
@@ -260,7 +259,7 @@ class Deal(models.Model):
 
     @classmethod
     def full_info(cls):
-        """Метод класса, возвращается вся информация о проведенных сделках
+        """Метод класса, возвращается вся информация о проведенных сделках:
         Для каждого продавца выводится список покупателей
         с суммой потраченной при совершении сделки
         Также выводится общая сумма, заработанная продавцом
@@ -269,10 +268,11 @@ class Deal(models.Model):
         for seller in MyUser.objects.filter(role='seller'):
             info += f'\nКлиенты {seller} потратили каждый:\n'
             for deal in cls.objects.filter(lot__seller=seller):
-                info += f'{deal.customer} - {int(deal.spent)} на {deal.lot.flower}\n'
+                info += (f'{deal.customer} - '
+                         f'{int(deal.spent)} на {deal.lot.flower}\n')
             info += (f'Итого {seller} заработал'
                      f' {seller.show_raised_by_user()}\n')
-        return info
+        print(info)
 
     def clean(self):
         """Проверяет, что сделка не совершается в отношении скрытого товара
