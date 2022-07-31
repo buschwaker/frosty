@@ -25,14 +25,14 @@ class MyUser(AbstractUser):
         return f'{self.username}'
 
     def show_spent_by_user(self):
-        """Возвращает сумму общую, потраченную пользователем"""
+        """Возвращает общую сумму, потраченную пользователем"""
         spent = 0
         for deal in self.deals.all():
             spent += float(deal.spent)
         return int(spent)
 
     def show_raised_by_user(self):
-        """Возвращает сумму, заработанную пользователем"""
+        """Возвращает общую сумму, заработанную пользователем"""
         raised = 0
         for deal in Deal.objects.filter(lot__seller__exact=self):
             raised += float(deal.spent)
@@ -47,9 +47,10 @@ class MyUser(AbstractUser):
         self.save()
 
     def clean(self):
-        """Поднимает ошибку при попытке поменять роль пользователя,
-         что будучи продавцом имеет незакрытые лоты
-         """
+        """Поднимает ошибку при попытке поменять роль 
+        пользователя на покупателя,
+        который будучи продавцом имеет незакрытые лоты
+        """
         if self.role == self.customer and self.items.exists():
             raise ValidationError(
                 'У пользователя, которому вы хотите'
@@ -259,7 +260,7 @@ class Deal(models.Model):
 
     @classmethod
     def full_info(cls):
-        """Метод класса, возвращается вся информация о проведенных сделках:
+        """Метод класса, возвращается вся информация о проведенных сделках
         Для каждого продавца выводится список покупателей
         с суммой потраченной при совершении сделки
         Также выводится общая сумма, заработанная продавцом
